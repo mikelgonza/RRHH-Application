@@ -1,0 +1,54 @@
+﻿@model IEnumerable<AppUser>
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<AppUser> _userManager
+@{
+    ViewData["Title"] = "Modify Roles";
+
+}
+
+<h1>Roles</h1>
+
+<h4>Registered Users</h4>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Users
+            </th>
+            <th>
+                Roles
+            </th>
+            <th>
+                Modify Role
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (AppUser usuario in Model)
+        {
+            IList<string> roles = await _userManager.GetRolesAsync(usuario);
+
+            @if (!User.Identity.Name.Equals(usuario.UserName))
+            {
+                <tr>
+                    <td>
+                        @usuario.UserName
+                    </td>
+                    <td>
+                        @roles[0]
+                    </td>
+                    <td>
+                        <a asp-action="AddRole" asp-route-id="@usuario.Id" asp-route-role="admin">admin</a> |
+                        <a asp-action="AddRole" asp-route-id="@usuario.Id" asp-route-role="subadmin">subadmin</a> |
+                        <a asp-action="AddRole" asp-route-id="@usuario.Id" asp-route-role="user">user</a>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+
+
+

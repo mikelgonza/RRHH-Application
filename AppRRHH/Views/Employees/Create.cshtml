@@ -1,0 +1,90 @@
+﻿@model AppRRHH.Models.Employee
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+@{ string message = Convert.ToString(TempData["msg"]); }
+
+<h1>Create</h1>
+
+<h4>Employee</h4>
+<hr />
+@if (!String.IsNullOrEmpty(message))
+{
+    var statusMessageClass = message.StartsWith("Error") ? "danger" : "success";
+    <div class="alert alert-@statusMessageClass alert-dismissible" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        @message
+    </div>
+}
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <img src="~/img/default-profile.png" id="photoFile" class="user-image-edit">
+            </div>
+            <div class="div_file">
+                <p class="texto">Select photo</p>
+                <input type="file" name="imageFile" id="inputFile" class="upload-image" />
+            </div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Surname" class="control-label"></label>
+                <input asp-for="Surname" class="form-control" />
+                <span asp-validation-for="Surname" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Seniority" class="control-label"></label>
+                <input asp-for="Seniority" type="date" class="form-control" />
+                <span asp-validation-for="Seniority" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="GrossSalary" class="control-label"></label>
+                <input name="GrossSalary" id="inputGrossSalary" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="NetSalary" class="control-label"></label>
+                <input name="NetSalary" id="inputNetSalary" class="form-control" />
+                <input maxlength="3" size="1" id="salaryPercent" class="form-control-mio" value="15" />
+                <input type="button" class="btn btn-primary btn-sm" value="% Apply Retention" onclick="calcNetSalary()" />
+            </div>
+            <div class="form-group">
+                <label asp-for="DepartmentId" class="control-label"></label>
+                <select asp-for="DepartmentId" class="form-control" asp-items="ViewBag.DepartmentId"></select>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+        inputFile.onchange = evt => {
+            const [file] = inputFile.files
+            if (file) {
+                photoFile.src = URL.createObjectURL(file)
+            }
+        }
+
+        function calcNetSalary() {
+            let gSalaryVal = document.querySelector('#inputGrossSalary').value;
+            let nSalary = document.querySelector('#inputNetSalary');
+            let percent = document.querySelector('#salaryPercent').value;
+            nSalary.value = gSalaryVal - ((gSalaryVal * percent) / 100);
+        }
+    </script>
+}

@@ -1,0 +1,119 @@
+﻿@model AppRRHH.Models.Employee
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+@{ string message = Convert.ToString(TempData["msg"]); }
+
+<h1>Edit</h1>
+
+<h4>Employee</h4>
+<hr />
+
+@if (!String.IsNullOrEmpty(message))
+{
+    var statusMessageClass = message.StartsWith("Error") ? "danger" : "success";
+    <div class="alert alert-@statusMessageClass alert-dismissible" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        @message
+    </div>
+}
+
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="Image" />
+            <div class="form-group">
+                <img src="~/img/@ViewBag.Image" id="photoFile" class="user-image-edit">
+            </div>
+            <div class="div_file">
+                <p class="texto">Change photo</p>
+                <input type="file" name="imageFile" id="inputFile" class="upload-image" />
+            </div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Surname" class="control-label"></label>
+                <input asp-for="Surname" class="form-control" />
+                <span asp-validation-for="Surname" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Seniority" class="control-label"></label>
+                <input asp-for="Seniority" type="date" class="form-control" />
+                <span asp-validation-for="Seniority" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="GrossSalary" class="control-label"></label>
+                @if (User.IsInRole("admin"))
+                {
+                    <input name="GrossSalary" id="inputGrossSalary" class="form-control" value="@ViewBag.GrossSalary" />
+                }
+                else
+                {
+                    <input name="GrossSalary" class="form-control" value="@ViewBag.GrossSalary" readonly />
+                }
+                <span asp-validation-for="GrossSalary" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="NetSalary" class="control-label"></label>
+                @if (User.IsInRole("admin"))
+                {
+                    <input name="NetSalary" id="inputNetSalary" class="form-control" value="@ViewBag.NetSalary" />
+                    <input maxlength="3" size="1" id="salaryPercent" class="form-control-mio" value="15" placeholder="15%" />
+                    <input type="button" class="btn btn-primary btn-sm" value="% Apply Retention" onclick="calcNetSalary()" />
+                }
+                else
+                {
+                    <input name="NetSalary" class="form-control" value="@ViewBag.NetSalary" readonly />
+                }
+                <span asp-validation-for="NetSalary" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DepartmentId" class="control-label"></label>
+                @if (User.IsInRole("admin"))
+                {
+                    <select asp-for="DepartmentId" class="form-control" asp-items="ViewBag.DepartmentId"></select>
+                }
+                else
+                {
+                    <select disabled asp-for="DepartmentId" class="form-control" asp-items="ViewBag.DepartmentId"></select>
+                    <input type="hidden" asp-for="DepartmentId" />
+                }
+                <span asp-validation-for="DepartmentId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+        inputFile.onchange = evt => {
+            const [file] = inputFile.files
+            if (file) {
+                photoFile.src = URL.createObjectURL(file)
+            }
+        }
+
+        function calcNetSalary() {
+            let gSalaryVal = document.querySelector('#inputGrossSalary').value;
+            let nSalary = document.querySelector('#inputNetSalary');
+            let percent = document.querySelector('#salaryPercent').value;
+            nSalary.value = gSalaryVal - ((gSalaryVal * percent) / 100);
+        }
+    </script>
+}
